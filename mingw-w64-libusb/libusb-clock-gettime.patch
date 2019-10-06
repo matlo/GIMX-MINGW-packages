@@ -1,0 +1,54 @@
+diff --git a/libusb/os/windows_nt_common.c b/libusb/os/windows_nt_common.c
+index 54338a7..ee761bb 100644
+--- a/libusb/os/windows_nt_common.c
++++ b/libusb/os/windows_nt_common.c
+@@ -638,8 +638,16 @@ static int windows_init(struct libusb_context *ctx)
+ 			goto init_exit;
+ 		}
+ 
+-		if (!windows_init_clock(ctx))
+-			goto init_exit;
++		if (windows_version < WINDOWS_7) {
++		    if (!windows_init_clock(ctx))
++		        goto init_exit;
++		} else {
++		    LARGE_INTEGER li_frequency;
++		    QueryPerformanceFrequency(&li_frequency);
++	        hires_frequency = li_frequency.QuadPart;
++	        hires_ticks_to_ps = UINT64_C(1000000000000) / hires_frequency;
++	        usbi_dbg("hires timer available (Frequency: %"PRIu64" Hz)", hires_frequency);
++		}
+ 
+ 		if (!htab_create(ctx))
+ 			goto init_exit;
+@@ -907,7 +915,7 @@ static int windows_handle_events(struct libusb_context *ctx, struct pollfd *fds,
+ 	return r;
+ }
+ 
+-static int windows_clock_gettime(int clk_id, struct timespec *tp)
++static int windows_clock_gettime_old(int clk_id, struct timespec *tp)
+ {
+ 	struct timer_request request;
+ #if !defined(_MSC_VER) || (_MSC_VER < 1900)
+@@ -966,6 +974,21 @@ static int windows_clock_gettime(int clk_id, struct timespec *tp)
+ 	}
+ }
+ 
++static int windows_clock_gettime(int clk_id, struct timespec *tp)
++{
++    if (windows_version < WINDOWS_7) {
++        return windows_clock_gettime_old(clk_id, tp);
++    }
++
++    LARGE_INTEGER hires_counter;
++
++    QueryPerformanceCounter(&hires_counter);
++    tp->tv_sec = (long)(hires_counter.QuadPart / hires_frequency);
++    tp->tv_nsec = (long)(((hires_counter.QuadPart % hires_frequency) / 1000) * hires_ticks_to_ps);
++
++    return LIBUSB_SUCCESS;
++}
++
+ // NB: MSVC6 does not support named initializers.
+ const struct usbi_os_backend usbi_backend = {
+ 	"Windows",
