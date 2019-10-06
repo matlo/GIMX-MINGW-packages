@@ -11,7 +11,7 @@ See https://github.com/msys2/MINGW-packages/blob/master/README.md
 
 ## avrdude
 
-* PKGBUILD: Remove libftdi and libusb dependencies.
+* PKGBUILD: Remove libftdi and libusb dependencies. Must be built without libftdi and libusb installed.
 
 ## pdcurses
 
