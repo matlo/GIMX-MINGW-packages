@@ -9,14 +9,14 @@ index 54338a7..ee761bb 100644
 -		if (!windows_init_clock(ctx))
 -			goto init_exit;
 +		if (windows_version < WINDOWS_7) {
-+		    if (!windows_init_clock(ctx))
-+		        goto init_exit;
++			if (!windows_init_clock(ctx))
++				goto init_exit;
 +		} else {
-+		    LARGE_INTEGER li_frequency;
-+		    QueryPerformanceFrequency(&li_frequency);
-+	        hires_frequency = li_frequency.QuadPart;
-+	        hires_ticks_to_ps = UINT64_C(1000000000000) / hires_frequency;
-+	        usbi_dbg("hires timer available (Frequency: %"PRIu64" Hz)", hires_frequency);
++			LARGE_INTEGER li_frequency;
++			QueryPerformanceFrequency(&li_frequency);
++			hires_frequency = li_frequency.QuadPart;
++			hires_ticks_to_ps = UINT64_C(1000000000000) / hires_frequency;
++			usbi_dbg("hires timer available (Frequency: %"PRIu64" Hz)", hires_frequency);
 +		}
  
  		if (!htab_create(ctx))
@@ -36,17 +36,17 @@ index 54338a7..ee761bb 100644
  
 +static int windows_clock_gettime(int clk_id, struct timespec *tp)
 +{
-+    if (windows_version < WINDOWS_7) {
-+        return windows_clock_gettime_old(clk_id, tp);
-+    }
++	if (windows_version < WINDOWS_7) {
++		return windows_clock_gettime_old(clk_id, tp);
++	}
 +
-+    LARGE_INTEGER hires_counter;
++	LARGE_INTEGER hires_counter;
 +
-+    QueryPerformanceCounter(&hires_counter);
-+    tp->tv_sec = (long)(hires_counter.QuadPart / hires_frequency);
-+    tp->tv_nsec = (long)(((hires_counter.QuadPart % hires_frequency) / 1000) * hires_ticks_to_ps);
++	QueryPerformanceCounter(&hires_counter);
++	tp->tv_sec = (long)(hires_counter.QuadPart / hires_frequency);
++	tp->tv_nsec = (long)(((hires_counter.QuadPart % hires_frequency) / 1000) * hires_ticks_to_ps);
 +
-+    return LIBUSB_SUCCESS;
++	return LIBUSB_SUCCESS;
 +}
 +
  // NB: MSVC6 does not support named initializers.
