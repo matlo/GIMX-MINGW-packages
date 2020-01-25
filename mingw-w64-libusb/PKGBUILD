@@ -14,7 +14,7 @@ options=('staticlibs' 'strip')
 source=("https://github.com/libusb/libusb/releases/download/v${pkgver}/${_realname}-${pkgver}.tar.bz2"
         libusb-clock-gettime.patch)
 sha256sums=('db11c06e958a82dac52cf3c65cb4dd2c3f339c8a988665110e0d24d19312ad8d'
-            '14f37ffef0f2f05b99c6d96a5882e946beaa2b7a8be85882e5aa588ed2109a93')
+            '3d2e93a61ae910733176065d985721a4d86f3a96e50de62b6f0168c266ef48e3')
 
 prepare() {
   cd "${srcdir}"/${_realname}-${pkgver}
