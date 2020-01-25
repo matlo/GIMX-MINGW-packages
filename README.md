@@ -12,10 +12,6 @@ See https://github.com/msys2/MINGW-packages/blob/master/README.md
 
 * PKGBUILD: Remove libftdi and libusb dependencies. Must be built without libftdi and libusb installed.
 
-## pdcurses
-
-* There was no recipie in the official msys2/MINGW-packages repository when I created this one. I will look at switching to the official one.
-
 ## libusb
 
 * libusb-clock-gettime.patch: disable the threaded windows\_clock\_gettime on Windows versions >= 7
