@@ -31,7 +31,8 @@ build() {
   CFLAGS='-O0 -g -fno-omit-frame-pointer' ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
-    --host=${MINGW_CHOST}
+    --host=${MINGW_CHOST} \
+    --disable-hidapi
 
   make V=1
 }
